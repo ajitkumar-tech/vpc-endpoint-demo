@@ -35,3 +35,6 @@ jobs:
       
       - name: terraform
         run: terraform apply -auto-approve
+      - name: Run shell script
+        run: sh role.sh
+      
