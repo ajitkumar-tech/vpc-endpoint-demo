@@ -130,7 +130,7 @@ resource "aws_instance" "instance" {
   vpc_security_group_ids = [aws_security_group.efs-sg.id]
   availability_zone  = "ap-south-1b"
 
-  tags = {
+  tags = { 
     Name = "instance-2"
   }
 }
