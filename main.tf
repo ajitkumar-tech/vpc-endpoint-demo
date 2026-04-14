@@ -134,3 +134,16 @@ resource "aws_instance" "instance" {
     Name = "instance-2"
   }
 }
+
+resource "aws_vpc_endpoint" "s3_endpoint" {
+  vpc_id       = "vpc-0f0d681d76871643e"
+  service_name = "com.amazonaws.ap-south-1.s3"
+
+  route_table_ids = [
+    "rtb-0ed60c3bfa22ace82"
+  ]
+
+  tags = {
+    Name = "s3-endpoint"
+  }
+}
