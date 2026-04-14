@@ -142,7 +142,7 @@ resource "aws_instance" "instance" {
 resource "aws_lb" "nlb" {
   name               = "my-nlb"
   internal           = false
-  load_balancer_type = "network"
+  load_balancer_type = "network" 
 
   subnets = [
     aws_subnet.public_subnet1.id,
