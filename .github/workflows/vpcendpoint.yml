@@ -34,7 +34,6 @@ jobs:
         run: terraform plan
       
       - name: terraform
-        run: terraform destroy -auto-approve
-      - name: Run shell script
-        run: sh role.sh
+        run: terraform apply -auto-approve
+      
       
