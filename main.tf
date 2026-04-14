@@ -13,24 +13,24 @@ resource "aws_vpc" "main" {
   }
 }
 
-resource "aws_subnet" "public_subnet" {    
+resource "aws_subnet" "public_subnet1" {    
   vpc_id                  = aws_vpc.main.id      
   cidr_block              = "10.0.1.0/24"
   map_public_ip_on_launch = var.is_enabled
   availability_zone       = var.availability_zones[0]
 
   tags = {
-    Name = "Public_Subnet"
+    Name = "Public_Subnet1"
   }
 }
 
-resource "aws_subnet" "private_subnet" {
+resource "aws_subnet" "public_subnet2" {
   vpc_id                  = aws_vpc.main.id
   cidr_block              = "10.0.2.0/24"
   availability_zone       = var.availability_zones[1]
 
   tags = {
-    Name = "Private_Subnet"
+    Name = "public_Subnet2"
   }
 }
 
@@ -42,7 +42,7 @@ resource "aws_internet_gateway" "igw" {
   }
 }
 
-resource "aws_route_table" "public_rt" {
+resource "aws_route_table" "public_rt1" {
   vpc_id = aws_vpc.main.id
 
   route {
@@ -51,27 +51,31 @@ resource "aws_route_table" "public_rt" {
   }
 
   tags = {
-    Name = "PublicRouteTable"
+    Name = "PublicRouteTable1"
   }
 }
-resource "aws_route_table" "private_rt" {
+resource "aws_route_table" "public_rt2" {
   vpc_id = aws_vpc.main.id
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.igw.id
+  }
 
   tags = {
-    Name = "Privateroutetable"
+    Name = "publicroutetable2"
   }
 }
 
 
 
 resource "aws_route_table_association" "subnet_1_assoc" {
-  subnet_id      = aws_subnet.public_subnet.id
-  route_table_id = aws_route_table.public_rt.id
+  subnet_id      = aws_subnet.public_subnet1.id
+  route_table_id = aws_route_table.public_rt1.id
 }
 
 resource "aws_route_table_association" "subnet_2_assoc" {
-  subnet_id      = aws_subnet.private_subnet.id
-  route_table_id = aws_route_table.private_rt.id
+  subnet_id      = aws_subnet.public_subnet2.id
+  route_table_id = aws_route_table.publicrt2.id
 }
 
 resource "aws_security_group" "efs-sg" {
@@ -113,7 +117,7 @@ resource "aws_instance" "example" {
   ami                = "ami-03793655b06c6e29a"
   instance_type      = "t3.micro"
   key_name           = "efs"
-  subnet_id          = aws_subnet.public_subnet.id
+  subnet_id          = aws_subnet.public_subnet1.id
   vpc_security_group_ids = [aws_security_group.efs-sg.id]
   availability_zone  = "ap-south-1a"
 
@@ -126,7 +130,7 @@ resource "aws_instance" "instance" {
   ami                = "ami-03793655b06c6e29a"
   instance_type      = "t3.micro"
   key_name           = "efs"
-  subnet_id          = aws_subnet.private_subnet.id
+  subnet_id          = aws_subnet.public_subnet2.id
   vpc_security_group_ids = [aws_security_group.efs-sg.id]
   availability_zone  = "ap-south-1b"
 
@@ -135,16 +139,3 @@ resource "aws_instance" "instance" {
   }
 }
 
-resource "aws_vpc_endpoint" "s3_endpoint" {
-  vpc_id       = "vpc-0bca5983fcd2a4d18"
-  service_name = "com.amazonaws.ap-south-1.s3"
-  vpc_endpoint_type = "Gateway"
-
-  route_table_ids = [
-    "rtb-0723d954278dd1815"
-  ]
-
-  tags = {
-    Name = "s3-endpoint"
-  }
-}
