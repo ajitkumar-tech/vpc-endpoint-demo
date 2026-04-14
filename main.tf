@@ -138,6 +138,7 @@ resource "aws_instance" "instance" {
 resource "aws_vpc_endpoint" "s3_endpoint" {
   vpc_id       = "vpc-0f0d681d76871643e"
   service_name = "com.amazonaws.ap-south-1.s3"
+  vpc_endpoint_type = "Gateway"
 
   route_table_ids = [
     "rtb-0ed60c3bfa22ace82"
