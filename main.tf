@@ -188,9 +188,3 @@ resource "aws_lb_target_group_attachment" "t2" {
   port             = 80
 }
 
-resource "aws_lb_target_group_attachment" "attach" {
-  target_group_arn = aws_lb_target_group.tg.arn
-  target_id        = aws_instance.example.id
-  port             = 80
-}
-
