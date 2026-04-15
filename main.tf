@@ -218,7 +218,7 @@ resource "aws_autoscaling_policy" "cpu_policy" {
   policy_type            = "TargetTrackingScaling"
 
   target_tracking_configuration {
-    target_value = 50.0
+    target_value = 10.0
 
     predefined_metric_specification {
       predefined_metric_type = "ASGAverageCPUUtilization"
