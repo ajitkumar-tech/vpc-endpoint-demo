@@ -13,24 +13,24 @@ resource "aws_vpc" "main" {
   }
 }
 
-resource "aws_subnet" "public_subnet1" {    
+resource "aws_subnet" "public_subnet" {    
   vpc_id                  = aws_vpc.main.id      
   cidr_block              = "10.0.1.0/24"
   map_public_ip_on_launch = var.is_enabled
   availability_zone       = var.availability_zones[0]
 
   tags = {
-    Name = "Public_Subnet1"
+    Name = "Public_Subnet"
   }
 }
 
-resource "aws_subnet" "public_subnet2" {
+resource "aws_subnet" "private_subnet" {
   vpc_id                  = aws_vpc.main.id
   cidr_block              = "10.0.2.0/24"
   availability_zone       = var.availability_zones[1]
 
   tags = {
-    Name = "public_Subnet2"
+    Name = "private_Subnet"
   }
 }
 
@@ -42,19 +42,14 @@ resource "aws_internet_gateway" "igw" {
   }
 }
 
-resource "aws_route_table" "public_rt1" {
+resource "aws_route_table" "public_rt" {
   vpc_id = aws_vpc.main.id
 
-  route {
-    cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.igw.id
-  }
-
   tags = {
-    Name = "PublicRouteTable1"
+    Name = "PublicRouteTable"
   }
 }
-resource "aws_route_table" "public_rt2" {
+resource "aws_route_table" "private_rt" {
   vpc_id = aws_vpc.main.id
   route {
     cidr_block = "0.0.0.0/0"
@@ -62,20 +57,20 @@ resource "aws_route_table" "public_rt2" {
   }
 
   tags = {
-    Name = "publicroutetable2"
+    Name = "publicroutetable"
   }
 }
 
 
 
 resource "aws_route_table_association" "subnet_1_assoc" {
-  subnet_id      = aws_subnet.public_subnet1.id
-  route_table_id = aws_route_table.public_rt1.id
+  subnet_id      = aws_subnet.public_subnet.id
+  route_table_id = aws_route_table.public_rt.id
 }
 
 resource "aws_route_table_association" "subnet_2_assoc" {
-  subnet_id      = aws_subnet.public_subnet2.id
-  route_table_id = aws_route_table.public_rt2.id
+  subnet_id      = aws_subnet.private_subnet.id
+  route_table_id = aws_route_table.private_rt.id
 }
 
 resource "aws_security_group" "efs-sg" {
@@ -117,7 +112,7 @@ resource "aws_instance" "example" {
   ami                = "ami-03793655b06c6e29a"
   instance_type      = "t3.micro"
   key_name           = "efs"
-  subnet_id          = aws_subnet.public_subnet1.id
+  subnet_id          = aws_subnet.public_subnet.id
   vpc_security_group_ids = [aws_security_group.efs-sg.id]
   availability_zone  = "ap-south-1a"
 
@@ -130,61 +125,12 @@ resource "aws_instance" "instance" {
   ami                = "ami-03793655b06c6e29a"
   instance_type      = "t3.micro"
   key_name           = "efs"
-  subnet_id          = aws_subnet.public_subnet2.id
+  subnet_id          = aws_subnet.private_subnet.id
   vpc_security_group_ids = [aws_security_group.efs-sg.id]
   availability_zone  = "ap-south-1b"
 
   tags = { 
     Name = "instance-2"
   }
-}
-
-resource "aws_lb" "nlb" {
-  name               = "my-nlb"
-  internal           = false
-  load_balancer_type = "network" 
-
-  subnets = [
-    aws_subnet.public_subnet1.id,
-    aws_subnet.public_subnet2.id
-  ]
-
-  enable_cross_zone_load_balancing = true
-}
-resource "aws_lb_target_group" "tg" {
-  name     = "nlb-target-group"
-  port     = 80
-  protocol = "TCP"
-  vpc_id   = aws_vpc.main.id
-
-  health_check {
-    protocol = "TCP"
-    port     = "traffic-port"
-  }
-}
-
-
-resource "aws_lb_listener" "listener" {
-  load_balancer_arn = aws_lb.nlb.arn
-  port              = 80
-  protocol          = "TCP"
-
-  default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.tg.arn
-  }
-}
-
-# Attach instances
-resource "aws_lb_target_group_attachment" "t1" {
-  target_group_arn = aws_lb_target_group.tg.arn
-  target_id        = aws_instance.example.id
-  port             = 80
-}
-
-resource "aws_lb_target_group_attachment" "t2" {
-  target_group_arn = aws_lb_target_group.tg.arn
-  target_id        = aws_instance.instance.id
-  port             = 80
 }
 
