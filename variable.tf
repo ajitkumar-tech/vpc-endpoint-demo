@@ -1,25 +1,21 @@
-variable "is_enabled" {
- type = bool
- default = true
-}
-
-variable "availability_zones" {
-type = list(string)
-default = ["ap-south-1a", "ap-south-1b"] 
-}
-
 variable "ingress-rules" {
   type = list(number)
-  default = [22,8080,80,443,2049]
+  default = [ 22,8080,80,443,30001 ]
 }
 
-variable "egress-rules" { 
+variable "egress-rules" {
   type = list(number)
-  default = [22,8080,80,443,2049]
+  default = [ 22,8080,80,443,30001 ]
 }
 
-variable "subnet_ids" {
-  description = "Default subnet IDs for EFS mount targets"
+variable "eks_cluster_policies" {
+  description = "List of policy ARNs to attach to the EKS cluster role"
   type        = list(string)
-  default = ["subnet-087ed570ca64886dd", "subnet-06f6dc639b36423c4"]
+  default = ["arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"]
+}
+
+variable "worker_node_policies" {
+  description = "List of policy ARNs to attach to the EKS worker node role"
+  type        = list(string)
+  default = ["arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy", "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy", "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly", "arn:aws:iam::aws:policy/AmazonEC2FullAccess", "arn:aws:iam::aws:policy/AmazonEKSLoadBalancingPolicy"]
 }
