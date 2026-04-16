@@ -134,24 +134,28 @@ resource "aws_instance" "instance" {
     Name = "instance-2"
   }
 }
-
-
-
 resource "aws_vpc_endpoint" "s3" {
-  vpc_id       = aws_vpc.main.id
-  service_name = "com.amazonaws.ap-south-1.s3"
-
+  vpc_id            = aws_vpc.main.id
+  service_name      = "com.amazonaws.ap-south-1.s3"
   vpc_endpoint_type = "Gateway"
-  route_table_ids   = [aws_route_table.private_rt.id]
 
- policy = jsonencode({
-  Version = "2012-10-17"
-  Statement = [
-    {
-      Effect   = "Allow"
-      Action   = "*"
-      Resource = "*"
-    }
-  ]
-})
+  route_table_ids = [aws_route_table.private_rt.id]
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect   = "Allow"
+        Action   = "*"
+        Resource = "*"
+      }
+    ]
+  })
+}
+
+
+
+
+
+
 
