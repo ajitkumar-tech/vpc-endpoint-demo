@@ -35,5 +35,45 @@ jobs:
       
       - name: terraform
         run: terraform destroy -auto-approve
+
+        
+      - name: repo check
+        run: aws ecr create-repository --repository-name ${{ env.name }}  --region ${{ env.Region }}
+        continue-on-error: true
+
+        
+
+      - name: build
+        run:  docker build -t ${{ env.name }} .
+
+      - name: tag
+        run: docker tag nginx:latest 585768173504.dkr.ecr.${{ env.Region }}.amazonaws.com/${{ env.name }}:latest
+           
+      - name: push    
+        run:  docker push 585768173504.dkr.ecr.${{ env.Region }}.amazonaws.com/${{ env.name }}:latest
+
+      - name: update kubeconfig
+        run: aws eks update-kubeconfig --name ${{ env.clustername }}    --region ${{ env.Region }} 
+
+      
+
+      - name: deploy 
+        run: kubectl apply -f nginx-deployment-service.yaml
+
+      - name: pod
+        run: kubectl get pods
+
+      
+
+        
+    
+
+
+
+      
+      
+
+      
+      
       
       
