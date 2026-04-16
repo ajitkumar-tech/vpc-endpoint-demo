@@ -129,7 +129,7 @@ resource "aws_iam_role_policy_attachment" "eks_cluster_policy" {
 resource "aws_eks_cluster" "eks_cluster" {
   name     = "my-eks-cluster"
   role_arn = aws_iam_role.eks_cluster_role.arn 
-  version = "1.32"
+  version = "1.35"
 
   vpc_config {
     subnet_ids         = [aws_subnet.public_subnet_1.id, aws_subnet.public_subnet_2.id]
@@ -176,7 +176,7 @@ resource "aws_eks_node_group" "eks_node_group" {
   subnet_ids      = [aws_subnet.public_subnet_1.id, aws_subnet.public_subnet_2.id]
   instance_types  = ["t2.medium"] 
   disk_size       = 20  
-  ami_type         = "AL2_x86_64"
+  ami_type         = "AL2023_x86_64"
   capacity_type    = "ON_DEMAND"  
   
   tags = {
