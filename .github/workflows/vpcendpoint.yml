@@ -7,6 +7,8 @@ on:
     
 env:                         
   Region: us-east-1 
+  name: nginx
+  clustername: my-eks-cluster
 jobs: 
   job1:   
     runs-on: ubuntu-latest 
