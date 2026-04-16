@@ -57,7 +57,7 @@ resource "aws_route_table" "private_rt" {
   }
 
   tags = {
-    Name = "publicroutetable"
+    Name = "privateroutetable"
   }
 }
 
@@ -132,5 +132,26 @@ resource "aws_instance" "instance" {
   tags = { 
     Name = "instance-2"
   }
+
+
+
+resource "aws_vpc_endpoint" "s3" {
+  vpc_id       = aws_vpc.main.id
+  service_name = "com.amazonaws.ap-south-1.s3"
+
+  vpc_endpoint_type = "Gateway"
+  route_table_ids   = [aws_route_table.private_rt.id]
+
+  policy = jsonencode({
+    Statement = [
+      {
+        Action   = "*"
+        Effect   = "Allow"
+        Resource = "*"
+        Principal = "*"
+      }
+    ]
+  })
+}
 }
 
